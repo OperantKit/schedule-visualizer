@@ -1,0 +1,94 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "schedule-visualizer"
+version = "0.0.0"
+description = "Dry-run timeline visualizer for reinforcement-schedule DSL programs: shows SD presentations and reinforcement availability over time without executing a session."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "OperantKit contributors" },
+]
+keywords = [
+  "behavior-analysis",
+  "operant-conditioning",
+  "reinforcement-schedule",
+  "contingency-dsl",
+  "visualization",
+  "timeline",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = [
+  "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8",
+  "pytest-cov",
+  "hypothesis>=6",
+]
+dev = [
+  "schedule-visualizer[test]",
+  "mypy>=1.10",
+  "ruff>=0.5",
+]
+
+[project.scripts]
+schedule-visualizer = "schedule_visualizer.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/OperantKit"
+Repository = "https://github.com/OperantKit/schedule-visualizer"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/schedule_visualizer"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+  "--strict-markers",
+  "--strict-config",
+  "-ra",
+]
+markers = [
+  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+  "unit: pure unit tests with no external dependencies",
+  "integration: tests that exercise cross-module interactions",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["schedule_visualizer"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+  "\\.\\.\\.",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "C4", "SIM", "RET"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
