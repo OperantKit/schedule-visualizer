@@ -1,5 +1,7 @@
 # schedule-visualizer
 
+:jp: [日本語版 README](README.ja.md)
+
 Dry-run timeline visualizer for reinforcement-schedule DSL programs. The tool
 takes a schedule expression (e.g. `"FI 30s"`, `"Conc(VI 30s, VI 60s)"`) plus a
 duration and renders a horizontal timeline showing **when reinforcement would
