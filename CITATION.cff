@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+title: "schedule-visualizer"
+authors:
+  - name: "OperantKit contributors"
+repository-code: "https://github.com/OperantKit/schedule-visualizer"
+license: MIT
+abstract: "Dry-run timeline visualizer for reinforcement-schedule DSL programs: shows SD presentations and reinforcement availability over time without executing a session."
