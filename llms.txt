@@ -1,0 +1,36 @@
+# schedule-visualizer
+
+> Dry-run timeline of a reinforcement schedule: from a contingency-dsl string (FR, VR, RR, FI, VI, RI, FT, VT, RT, CRF, EXT; Conc, Mult, Chain) and a duration, lists and draws when reinforcement would become available, one lane per component, without running a session.
+
+schedule-visualizer is part of OperantKit, a set of Python/Rust packages for designing and running operant and respondent conditioning experiments (reinforcement schedules, session recording, analysis). Use it to preview a schedule while designing an experiment. It does not simulate responding: ratio schedules are shown as response-count annotations, and variable intervals are drawn from an exponential distribution for illustration rather than from the Fleshler-Hoffman progression used when the schedule actually runs.
+
+## Install
+
+```bash
+pip install git+https://github.com/OperantKit/schedule-visualizer
+```
+
+## Minimal example
+
+```python
+from schedule_visualizer.render import render_timeline
+from schedule_visualizer.stepper import step_schedule
+
+timeline = step_schedule("FI 30s", duration_s=90.0)
+print([e.timestamp for e in timeline.events()])  # [30.0, 60.0, 90.0]
+render_timeline(timeline, "fi.png")
+```
+
+CLI: `schedule-visualizer visualize "Conc(VI 30s, VI 60s)" --duration 120 --output conc.png --seed 7`.
+
+## Docs
+
+- [README](https://github.com/OperantKit/schedule-visualizer/blob/main/README.md): scope, 30-second example, supported schedule subset
+- [AGENTS.md](https://github.com/OperantKit/schedule-visualizer/blob/main/AGENTS.md): when to use this package and what not to do
+
+## Related packages
+
+- [contingency-dsl](https://github.com/OperantKit/contingency-dsl): the schedule language specification
+- [schedule-writer](https://github.com/OperantKit/schedule-writer): builds schedule strings without writing DSL syntax
+- [contingency-py](https://github.com/OperantKit/contingency-py): runs the schedule against responses (`pip install contingency-py`)
+- [experiment-io](https://github.com/OperantKit/experiment-io): virtual subjects for simulated sessions (`pip install experiment-io`)
