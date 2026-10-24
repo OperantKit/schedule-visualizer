@@ -63,7 +63,7 @@ schedule-visualizer visualize "Conc(FI 30s, VI 60s)" --duration 120 --seed 7 --o
 - **シミュレーションではありません。** 被験体も反応もありません。FI の印は、強化子が利用可能になった瞬間に受け取られたとみなした時刻です。実際のセッションでは強化子の提示の後に次の間隔が始まるので、実際の時刻はこれより遅れます。反応と提示された強化子を見るには、contingency-py と [experiment-io](https://github.com/OperantKit/experiment-io) の仮想被験体、または [operantkit-cli](https://github.com/OperantKit/operantkit-cli) でスケジュールを走らせてください。
 - **VI と VT の時刻はセッションの時刻ではありません。** contingency-py が使う Fleshler–Hoffman (1962) の数列ではなく、指数分布から引いています。
 - **`Mult` と `Chain` のレーンは順序を表しません。** どの成分も全区間にわたって並べており、成分が提示される順にはなっていません。
-- **読めるのは contingency-dsl の書き方の一部だけです。** `Tand`、`Alt`、切替遅延（`COD=2s`）、ハイフン付きの単位（`30-s`）、注釈、複数の段階からなる実験計画は拒否されます。`RR n` は平均比率 n として読みます。schedule-writer が書く確率の形 `RR 0.2` は正しく読めません。
+- **読めるのは contingency-dsl の書き方の一部だけです。** `Tand`、`Alt`、切替遅延（`COD=2s`）、ハイフン付きの単位（`30-s`）、注釈、複数の段階からなる実験計画は拒否されます。`RR n` は平均比率 n として読みます。比率の値が整数でないもの（schedule-writer が書く確率の形 `RR 0.2` など）はエラーとして拒否されます。
 
 ## AI のコーディングエージェント向け
 

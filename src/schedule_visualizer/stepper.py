@@ -202,6 +202,13 @@ def _parse(text: str) -> _Node:
             )
         if value <= 0:
             raise ScheduleParseError(f"{family} parameter must be positive, got {value}")
+        # The ratio value is a response count (RR n is a mean ratio with
+        # per-response probability 1/n, not the probability itself), so a
+        # fractional value is rejected rather than truncated by int().
+        if not value.is_integer():
+            raise ScheduleParseError(
+                f"{family} parameter must be an integer response count, got {value_s}"
+            )
 
     return _Atomic(family=family, parameter=value, raw=raw)
 

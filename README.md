@@ -63,7 +63,7 @@ Times take the units `s`, `ms`, or `min` (`FI 30s`, `VI 2min`). Anything else ra
 - **It is not a simulation.** There is no subject and no responding. Each FI marker assumes the reinforcer is collected the moment it becomes available; in a session the next interval starts after delivery, so real times come later. To see responding and delivered reinforcers, run the schedule with contingency-py and a virtual subject from [experiment-io](https://github.com/OperantKit/experiment-io), or with [operantkit-cli](https://github.com/OperantKit/operantkit-cli).
 - **VI and VT times are not the session's times.** They come from an exponential distribution, not from the Fleshler–Hoffman (1962) progression that contingency-py uses.
 - **The `Mult` and `Chain` lanes are not a sequence.** Each component is laid out over the whole duration, not in the order the components would be presented.
-- **Only a subset of the contingency-dsl notation is read.** `Tand`, `Alt`, changeover delays (`COD=2s`), the hyphenated units (`30-s`), annotations, and multi-phase designs are rejected. `RR n` is read as a mean ratio n; the probability form `RR 0.2` that schedule-writer writes is not read correctly.
+- **Only a subset of the contingency-dsl notation is read.** `Tand`, `Alt`, changeover delays (`COD=2s`), the hyphenated units (`30-s`), annotations, and multi-phase designs are rejected. `RR n` is read as a mean ratio n; a fractional ratio value, such as the probability form `RR 0.2` that schedule-writer writes, is rejected with an error.
 
 ## For AI coding agents
 

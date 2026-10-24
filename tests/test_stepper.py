@@ -237,6 +237,28 @@ def test_ratio_with_time_unit_raises() -> None:
 
 
 @pytest.mark.unit
+def test_rr_fractional_value_raises_instead_of_truncating() -> None:
+    # RR n is a mean ratio (per-response probability 1/n), and contingency-dsl
+    # rejects a non-integer ratio value (ATOMIC_RATIO_NON_INTEGER). "RR 0.2"
+    # must not be truncated to "RR 0 ... Bernoulli(1/0)".
+    with pytest.raises(ScheduleParseError, match="integer"):
+        step_schedule("RR 0.2", duration_s=10.0)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("schedule", ["FR 2.5", "VR 7.5", "RR 2.5"])
+def test_ratio_fractional_value_raises(schedule: str) -> None:
+    with pytest.raises(ScheduleParseError, match="integer"):
+        step_schedule(schedule, duration_s=10.0)
+
+
+@pytest.mark.unit
+def test_ratio_integer_valued_float_is_accepted() -> None:
+    tl = step_schedule("RR 5.0", duration_s=10.0)
+    assert "Bernoulli(1/5)" in (tl.events()[0].label or "")
+
+
+@pytest.mark.unit
 def test_negative_duration_raises() -> None:
     with pytest.raises(ValueError):
         step_schedule("FI 30s", duration_s=-1.0)
