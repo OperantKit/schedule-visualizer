@@ -2,37 +2,23 @@
 
 :jp: [日本語版 README](README.ja.md)
 
-Dry-run timeline visualizer for reinforcement-schedule DSL programs. The tool
-takes a schedule expression (e.g. `"FI 30s"`, `"Conc(VI 30s, VI 60s)"`) plus a
-duration and renders a horizontal timeline showing **when reinforcement would
-become available** under that schedule.
+schedule-visualizer draws, from a schedule expression such as `Conc(FI 30s, VI 60s)`, a timeline of when each component would make a reinforcer available. It is for designing an experiment or teaching schedules: you can see the spacing of reinforcer availability before anything is run. Within [OperantKit](https://github.com/OperantKit), it previews the expressions that [schedule-writer](https://github.com/OperantKit/schedule-writer) builds and [contingency-py](https://github.com/OperantKit/contingency-py) runs.
 
-## What this tool is (and is not)
+- **From a string to a figure in two calls,** one lane per component.
+- **No invented times.** Ratio schedules depend on responses, so they are labeled, not placed on the time axis.
+- **Same figure every time** for a given `seed`.
 
-- **Is**: a *dry-run* visualization of schedule availability. Time-based
-  schedules (FI, VI, FT, VT) place markers at the times reinforcement becomes
-  available. Compound schedules (`Conc`, `Mult`, `Chain`) lay out their
-  components on separate lanes.
-- **Is not**: a behavioral simulator. There is no virtual subject, no response
-  stream, and no consumption of reinforcers. Ratio schedules (FR, VR) are
-  inherently response-dependent, so they are rendered as annotations
-  (`rf_after_response_n=N`) rather than time-located markers.
+## Installation
 
-For responding by a virtual subject, run the schedule with contingency-py and
-the virtual subjects of experiment-io (see the example below).
-
-Variable-interval and variable-time values are drawn from an exponential
-distribution with the given mean, not from the Fleshler-Hoffman progression
-that contingency-py uses, so a preview shows the kind of spacing, not the
-exact times of a session.
-
-## 30-second example
+Python 3.11 or newer. schedule-visualizer is not on PyPI yet; install it from GitHub. The only dependency is matplotlib, which pip installs from PyPI.
 
 ```bash
 pip install git+https://github.com/OperantKit/schedule-visualizer
 ```
 
-List the times at which each component of a concurrent schedule would make a reinforcer available during the first 2 min, and draw the timeline:
+## Example
+
+List the times at which each component of `Conc(FI 30s, VI 60s)` makes a reinforcer available during the first 2 min, and draw the timeline:
 
 ```python
 from schedule_visualizer.render import render_timeline
@@ -53,50 +39,50 @@ for event in timeline.events():
 render_timeline(timeline, "conc.png")  # one lane per component
 ```
 
-The FI component sets up a reinforcer every 30 s; the VI 60 s times are drawn with `seed=7`, so the output is the same on every run. To see responding and delivered reinforcers instead of availability, run the schedule with [contingency-py](https://github.com/OperantKit/contingency-py) and a virtual subject from [experiment-io](https://github.com/OperantKit/experiment-io), or with [operantkit-cli](https://github.com/OperantKit/operantkit-cli).
-
-## Why not plot the schedule by hand?
-
-- **One call from a schedule string to a figure.** `step_schedule` reads the same surface syntax as contingency-dsl (atomic FR, VR, RR, FI, VI, RI, FT, VT, RT, CRF, EXT; compound `Conc`, `Mult`, `Chain`) and `render_timeline` draws one lane per component.
-- **Response-dependent schedules are not faked.** Ratio schedules are shown as annotations (`rf_after_response_n=N`), not as times, because their reinforcers depend on responses that a dry run does not have; `EXT` is marked as "no reinforcement".
-- **Reproducible.** Variable and random schedules take a `seed`; the CLI has `--seed`.
-- **Light.** The only runtime dependency is matplotlib; the parser for this subset is built in.
-
-## Install (development)
+The same from the command line:
 
 ```bash
-mise exec -- python -m venv .venv
+schedule-visualizer visualize "Conc(FI 30s, VI 60s)" --duration 120 --seed 7 --output conc.png
+```
+
+## What it shows
+
+| Schedule | On the timeline |
+|---|---|
+| `FI t`, `FT t` | A marker at t, 2t, 3t, … |
+| `VI t`, `VT t` | Markers spaced by intervals drawn from an exponential distribution with mean t (`seed` fixes them) |
+| `RI t`, `RT t` | A marker at each 1-s tick with probability 1/t |
+| `FR n`, `VR n`, `RR n`, `CRF` | A label (`rf_after_response_n=n`), because the reinforcer depends on responses |
+| `EXT` | A label "no reinforcement" |
+| `Conc(...)`, `Mult(...)`, `Chain(...)` | One lane per component |
+
+Times take the units `s`, `ms`, or `min` (`FI 30s`, `VI 2min`). Anything else raises `ScheduleParseError`.
+
+## Limitations
+
+- **It is not a simulation.** There is no subject and no responding. Each FI marker assumes the reinforcer is collected the moment it becomes available; in a session the next interval starts after delivery, so real times come later. To see responding and delivered reinforcers, run the schedule with contingency-py and a virtual subject from [experiment-io](https://github.com/OperantKit/experiment-io), or with [operantkit-cli](https://github.com/OperantKit/operantkit-cli).
+- **VI and VT times are not the session's times.** They come from an exponential distribution, not from the Fleshler–Hoffman (1962) progression that contingency-py uses.
+- **The `Mult` and `Chain` lanes are not a sequence.** Each component is laid out over the whole duration, not in the order the components would be presented.
+- **Only a subset of the contingency-dsl notation is read.** `Tand`, `Alt`, changeover delays (`COD=2s`), the hyphenated units (`30-s`), annotations, and multi-phase designs are rejected. `RR n` is read as a mean ratio n; the probability form `RR 0.2` that schedule-writer writes is not read correctly.
+
+## For AI coding agents
+
+Guidance for AI coding agents is in [AGENTS.md](AGENTS.md).
+
+## Development
+
+```bash
+python -m venv .venv
 .venv/bin/python -m pip install -e ".[dev]"
+.venv/bin/pytest
 ```
 
-## CLI
+Every `python` block in both READMEs is run by `tests/test_readme_examples.py`.
 
-```bash
-schedule-visualizer --help
-schedule-visualizer visualize "FI 30s" --duration 90 --output fi.png
-schedule-visualizer visualize "Conc(VI 30s, VI 60s)" --duration 120 \
-    --output conc.png --seed 7
-```
+## References
 
-## Python API
+Fleshler, M., & Hoffman, H. S. (1962). A progression for generating variable-interval schedules. *Journal of the Experimental Analysis of Behavior, 5*(4), 529–530. https://doi.org/10.1901/jeab.1962.5-529
 
-```python
-from schedule_visualizer.stepper import step_schedule
-from schedule_visualizer.render import render_timeline
+## License
 
-timeline = step_schedule("FI 30s", duration_s=90.0)
-render_timeline(timeline, "fi.png")
-```
-
-## Supported schedule subset
-
-Atomic: `FR n`, `VR n`, `RR n`, `FI t`, `VI t`, `RI t`, `FT t`, `VT t`,
-`RT t`, `CRF`, `EXT`. Compound: `Conc(...)`, `Mult(...)`, `Chain(...)`.
-
-The parser is local to this package so the visualizer has no runtime
-dependency on `contingency-py` or `contingency-dsl`. Programs that use
-syntax outside of this subset will raise `ScheduleParseError`.
-
-## Status
-
-Alpha.
+MIT (declared in `pyproject.toml`).

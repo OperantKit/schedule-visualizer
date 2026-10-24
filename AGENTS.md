@@ -26,6 +26,15 @@ To see responding and delivered reinforcers, run the schedule with contingency-p
 
 Use behavior-analytic terms: *reinforcer* (not "reward"), *discriminative stimulus* (not "trigger"), *establishing operation* when discussing motivation, *operandum* for a lever, key, or button.
 
+## Why not plot the schedule by hand?
+
+(Moved from README.md unchanged.)
+
+- **One call from a schedule string to a figure.** `step_schedule` reads the same surface syntax as contingency-dsl (atomic FR, VR, RR, FI, VI, RI, FT, VT, RT, CRF, EXT; compound `Conc`, `Mult`, `Chain`) and `render_timeline` draws one lane per component.
+- **Response-dependent schedules are not faked.** Ratio schedules are shown as annotations (`rf_after_response_n=N`), not as times, because their reinforcers depend on responses that a dry run does not have; `EXT` is marked as "no reinforcement".
+- **Reproducible.** Variable and random schedules take a `seed`; the CLI has `--seed`.
+- **Light.** The only runtime dependency is matplotlib; the parser for this subset is built in.
+
 ## Working on this repository
 
 - Python 3.11+. Create the environment with `python -m venv .venv` and `.venv/bin/python -m pip install -e ".[dev]"`; run `.venv/bin/pytest`.
